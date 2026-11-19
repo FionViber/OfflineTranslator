@@ -2,17 +2,17 @@
 <html lang="en-US">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' blob: 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com/FionViber/OfflineTranslator/main/v2/; worker-src blob:; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' blob: 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com/FionViber/; worker-src blob:; base-uri 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#e6f0f8">
   <title>Translator · FionViber</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/tokens.css">
-  <link rel="stylesheet" href="assets/translator.css">
-  <script defer src="bundle-catalog.js"></script>
-  <script defer src="model-reader.js"></script>
-  <script defer src="controller.js"></script>
-  <script defer src="ui.js"></script>
+  <link rel="stylesheet" href="assets/tokens.css?v=full-20261119">
+  <link rel="stylesheet" href="assets/translator.css?v=full-20261119">
+  <script defer src="bundle-catalog.js?v=full-20261119"></script>
+  <script defer src="model-reader.js?v=full-20261119"></script>
+  <script defer src="controller.js?v=full-20261119"></script>
+  <script defer src="ui.js?v=full-20261119"></script>
 </head>
 <body>
   <a class="skip" href="#workspace" data-text="skip">Skip to the translator</a>
@@ -45,16 +45,14 @@
   <main class="container" id="workspace" tabindex="-1">
     <div class="intro">
       <h1 data-text="title">Translator</h1>
-      <p data-text="intro">Translate using Firefox BASE models in your browser.</p>
+      <p data-text="intro">Translate text on your device with Firefox translation models.</p>
     </div>
 
     <section class="editor section" aria-label="Translator" data-label="workspace">
       <div class="direction-bar">
-        <label for="direction" data-text="direction">Translation direction</label>
-        <select id="direction">
-          <option value="zh-en" data-text="zhen">Simplified Chinese → English</option>
-          <option value="en-zh" data-text="enzh">English → Simplified Chinese</option>
-        </select>
+        <label class="language-choice"><span data-text="fromLanguage">From</span><select id="from-language"></select></label>
+        <label class="language-choice"><span data-text="toLanguage">To</span><select id="to-language"></select></label>
+        <span id="route-note" class="route-note"></span>
       </div>
       <div class="panes">
         <div class="pane">
@@ -70,15 +68,16 @@
       <div class="actions">
         <button class="btn-primary" id="translate" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-translate"/></svg><span>Translate</span></button>
         <button id="copy" class="copy" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span data-text="copy">Copy translation</span></button>
+        <span id="model-status" class="model-status" role="status" aria-live="polite"></span>
       </div>
       <p id="error" role="alert" hidden></p>
     </section>
 
-    <section class="model-section section" id="models" aria-labelledby="models-title" tabindex="-1">
-      <div class="model-heading">
+    <details class="model-section section" id="models">
+      <summary class="model-heading">
         <h2 id="models-title" data-text="models">Model library</h2>
         <p><svg class="icon small" aria-hidden="true"><use href="#i-clock"/></svg><span data-text="retention">Models unload after 1 minute of inactivity</span></p>
-      </div>
+      </summary>
       <table class="model-table">
         <thead><tr>
           <th scope="col" data-text="model">Translation model</th>
@@ -87,7 +86,7 @@
         </tr></thead>
         <tbody id="model-rows"></tbody>
       </table>
-    </section>
+    </details>
     <noscript><p>Enable JavaScript to use the translator. 请启用 JavaScript 以使用翻译功能。</p></noscript>
   </main>
   <footer><div class="container foot-inner"><span class="footer-brand">FionViber</span></div></footer>

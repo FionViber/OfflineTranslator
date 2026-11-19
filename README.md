@@ -2,14 +2,14 @@
 
 [GitHub Pages](https://fionviber.github.io/OfflineTranslator/) · [Cloudflare Pages](https://fionviber-translation-models.pages.dev/)
 
-Translate text locally in a browser using Bergamot and Firefox Translations BASE models. The site has English, Simplified Chinese and Traditional Chinese interfaces.
+Translate text on your device using Bergamot and Mozilla Firefox translation models. The interface is available in English, Simplified Chinese and Traditional Chinese.
 
-Choose a direction and select **Translate**. The page downloads only the models needed for that direction. Some language pairs translate through English. The browser can reuse previously cached models. Text is processed by a WebAssembly worker on your device.
+Select the source and target languages, enter text and choose Translate. Model data is downloaded only when the translation needs it. The model library starts collapsed. Where a direct model is unavailable, supported pairs can translate through English.
 
-The model catalog contains 11 direct directions across Arabic, German, English, Japanese, Korean, Lithuanian, Russian and Simplified Chinese. It follows the exact `base` architecture entries in Mozilla's model registry snapshot dated 19 November 2026.
+This edition offers 61 language codes, 118 direct model directions and 3540 routes. Model selection uses the strongest available architecture for each direction in the 19 November 2026 Mozilla registry snapshot. There are 11 BASE, 62 base-memory and 45 tiny directions.
 
-## Model files
+## Model hosting
 
-The `v2/` directory contains compressed model chunks of up to 16 MiB. GitHub Pages reads chunks from this repository's Raw URLs. Cloudflare Pages reads chunks from its own project. The browser verifies binary sizes and SHA-256 before using them.
+GitHub Pages downloads only from this account's Raw model repositories. Cloudflare Pages downloads the same verified chunks from its own site. The browser verifies the model files and can keep them in its local cache. The provenance manifest and notices are in licenses/.
 
-The Bergamot and Firefox Translations notices and the model provenance manifest are in `licenses/`.
+[Mozilla model registry](https://storage.googleapis.com/moz-fx-translations-data--303e-prod-translations-data/db/models.json)

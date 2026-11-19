@@ -3649,9 +3649,10 @@ function startLocalBergamot(encodedWasm) {
   let engine;
   let service;
   let sourceLanguage;
+  const sourceIsChinese = () => ["zh", "zh-Hans", "zh-Hant"].includes(sourceLanguage);
 
-  async function initialize({direction, files, assets, compressed: isCompressed = false}) {
-    if (runtime || !/^[a-z]{2,3}-[a-z]{2,3}$/.test(direction)) {
+  async function initialize({direction, files, assets, precision = "int8shiftAlphaAll", compressed: isCompressed = false}) {
+    if (runtime || !/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*:[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(direction)) {
       throw new Error("Invalid model selection.");
     }
     if (!files.model || !files.lex || !(files.vocab || (files.srcvocab && files.trgvocab))) {
@@ -3752,14 +3753,14 @@ function startLocalBergamot(encodedWasm) {
     for (const block of blocks.vocab ? [blocks.vocab] : [blocks.srcvocab, blocks.trgvocab]) {
       vocabs.push_back(block);
     }
-    const [from, to] = direction.split("-");
+    const [from, to] = direction.split(":");
     sourceLanguage = from;
     // The selected Firefox BASE models contain intgemm alpha-quantized weights.
     const settings = {
       "beam-size": 1, normalize: "1.0", "word-penalty": 0, "max-length-break": 128,
       "mini-batch-words": 1024, workspace: 128, "max-length-factor": "2.0",
       "skip-cost": true, "cpu-threads": 0, quiet: true, "quiet-translation": true,
-      "gemm-precision": "int8shiftAlphaAll", alignment: "soft"
+      "gemm-precision": precision === "int8shiftAll" ? "int8shiftAll" : "int8shiftAlphaAll", alignment: "soft"
     };
     const config = Object.entries(settings).map(([key, value]) => key + ": " + value).join("\n") + "\n";
     engine = new runtime.TranslationModel(from, to, config, blocks.model, blocks.lex, vocabs, null);
@@ -3772,8 +3773,8 @@ function startLocalBergamot(encodedWasm) {
   // Firefox's max-length-break setting. Keep complete sentences together, and
   // split only oversized ones at a clause or word boundary.
   function translateLine(line) {
-    const threshold = sourceLanguage === "zh" ? 128 : 384;
-    const size = sourceLanguage === "zh" ? 70 : 210;
+    const threshold = sourceIsChinese() ? 128 : 384;
+    const size = sourceIsChinese() ? 70 : 210;
     if (line.length <= threshold) return translatePart(line);
     const sentences = new Intl.Segmenter(sourceLanguage, {granularity: "sentence"});
     const translated = [];
@@ -3810,7 +3811,7 @@ function startLocalBergamot(encodedWasm) {
         if (input) output.push(translatePart(input).trim());
       }
     }
-    const joiner = sourceLanguage === "zh" ? " " : "";
+    const joiner = sourceIsChinese() ? " " : "";
     return leading + output.join(joiner) + trailing;
   }
 
@@ -3818,7 +3819,7 @@ function startLocalBergamot(encodedWasm) {
     if (!line.trim()) return line;
     const [ , leading, input, trailing ] = /^(\s*)([\s\S]*?)(\s*)$/.exec(line);
     let source = input.replace(/\u00ad/g, "");
-    if (sourceLanguage === "zh") source = source.replace(/([。！？])“/g, "$1 “");
+    if (sourceIsChinese()) source = source.replace(/([。！？])“/g, "$1 “");
     if (!source) return leading + trailing;
     const messages = new runtime.VectorString();
     const options = new runtime.VectorResponseOptions();

@@ -5,11 +5,11 @@
     "en-US": {
       skip: "Skip to the translator", nav: "Page navigation",
       workspace: "Translator", models: "Model library", title: "Translator",
-      intro: "Translate using Firefox BASE models in your browser.",
+      intro: "Translate text on your device with Firefox translation models.", fromLanguage: "From", toLanguage: "To", viaEnglish: "Via English",
       direction: "Translation direction", zhen: "Simplified Chinese → English", enzh: "English → Simplified Chinese",
       en: "English", zh: "Simplified Chinese", source: "Source text", result: "Translation",
       sourcePlaceholder: "Type or paste your text here.", resultPlaceholder: "Your translation will appear here.",
-      translate: "Translate", translating: "Translating…", preparing: "Loading model…",
+      translate: "Translate", translating: "Translating…", preparing: "Loading model…", modelIdle: "Select Translate to load the selected model.", modelLoading: "Loading the selected model…",
       staleSource: "Source text edited. Select Translate to update the result.",
       staleDirection: "Translation direction changed. Select Translate to update the result.",
       staleBoth: "Source text and direction changed. Select Translate to update the result.",
@@ -29,11 +29,11 @@
     },
     "zh-Hans": {
       skip: "跳到翻译区", nav: "页面导航", workspace: "翻译", models: "模型列表", title: "翻译",
-      intro: "使用 Firefox BASE 模型在浏览器中翻译。",
+      intro: "使用 Firefox 翻译模型在设备本地翻译文本。", fromLanguage: "源语言", toLanguage: "目标语言", viaEnglish: "经英语中转",
       direction: "翻译方向", zhen: "简体中文 → 英语", enzh: "英语 → 简体中文",
       en: "英语", zh: "简体中文", source: "原文", result: "译文",
       sourcePlaceholder: "在此输入或粘贴原文。", resultPlaceholder: "翻译结果将在此显示。",
-      translate: "翻译", translating: "正在翻译…", preparing: "正在加载模型…",
+      translate: "翻译", translating: "正在翻译…", preparing: "正在加载模型…", modelIdle: "点击“翻译”后才会加载所选模型。", modelLoading: "正在加载所选模型…",
       staleSource: "原文已修改。请点击“翻译”更新译文。",
       staleDirection: "翻译方向已更改。请点击“翻译”更新译文。",
       staleBoth: "原文和翻译方向均已更改。请点击“翻译”更新译文。",
@@ -53,11 +53,11 @@
     },
     "zh-Hant": {
       skip: "跳至翻譯區", nav: "頁面導覽", workspace: "翻譯", models: "模型清單", title: "翻譯",
-      intro: "使用 Firefox BASE 模型在瀏覽器中翻譯。",
+      intro: "使用 Firefox 翻譯模型在裝置本機翻譯文字。", fromLanguage: "來源語言", toLanguage: "目標語言", viaEnglish: "經英語轉譯",
       direction: "翻譯方向", zhen: "簡體中文 → 英語", enzh: "英語 → 簡體中文",
       en: "英語", zh: "簡體中文", source: "原文", result: "譯文",
       sourcePlaceholder: "在此輸入或貼上原文。", resultPlaceholder: "譯文將顯示在這裡。",
-      translate: "翻譯", translating: "正在翻譯…", preparing: "正在載入模型…",
+      translate: "翻譯", translating: "正在翻譯…", preparing: "正在載入模型…", modelIdle: "點選「翻譯」後才會載入所選模型。", modelLoading: "正在載入所選模型…",
       staleSource: "原文已修改。請點選「翻譯」更新譯文。",
       staleDirection: "翻譯方向已變更。請點選「翻譯」更新譯文。",
       staleBoth: "原文與翻譯方向均已變更。請點選「翻譯」更新譯文。",
@@ -90,24 +90,59 @@
   for (const editor of [source, result]) {
     linkedHeights.observe(editor, { attributes: true, attributeFilter: ["style"] });
   }
-  const direction = byId("direction");
-  const directionNames = { ar: ["Arabic", "阿拉伯语", "阿拉伯語"], de: ["German", "德语", "德語"], en: ["English", "英语", "英語"], ja: ["Japanese", "日语", "日語"], ko: ["Korean", "韩语", "韓語"], lt: ["Lithuanian", "立陶宛语", "立陶宛語"], ru: ["Russian", "俄语", "俄語"], zh: ["Simplified Chinese", "简体中文", "簡體中文"] };
-  const directionLabel = (code) => directionNames[code] || [code, code, code];
-  function buildDirectionControls() {
-    const catalogs = Object.keys(globalThis.BUNDLE_CATALOG).sort();
-    const codes = [...new Set(catalogs.flatMap(pair => pair.split("-")))].sort();
-    const routes = codes.flatMap(from => codes.map(to => from + "-" + to))
-      .filter(pair => globalThis.LocalTranslator.route(pair).length);
-    direction.replaceChildren(...routes.map(value => new Option("", value)));
-    direction.value = "zh-en";
-    const rows = byId("model-rows");
-    rows.replaceChildren(...catalogs.map(value => { const [from, to] = value.split("-"); const row = document.createElement("tr"); row.dataset.direction = value; row.innerHTML = `<th scope="row"><span class="model-language"></span><span class="model-spec"></span></th><td><span class="mobile-label" data-text="disk">From server</span><div class="model-state"><span data-disk role="status">Checking…</span><div class="progress-detail" hidden><progress></progress><span class="progress-value"></span></div></div></td><td><span class="mobile-label" data-text="ram">In memory (RAM)</span><div class="model-state"><span data-ram role="status">Not loaded</span><div class="progress-detail" hidden><progress></progress><span class="progress-value"></span></div></div></td>`; row.querySelector(".model-language").dataset.from = from; row.querySelector(".model-language").dataset.to = to; return row; }));
+  const fromSelect = byId("from-language");
+  const toSelect = byId("to-language");
+  const catalog = globalThis.BUNDLE_CATALOG;
+  const directions = Object.keys(catalog).sort();
+  const sourceCodes = [...new Set(directions.map(pair => pair.split(":")[0]))];
+  const targetCodes = [...new Set(directions.map(pair => pair.split(":")[1]))];
+  const selectedDirection = () => fromSelect.value + ":" + toSelect.value;
+  let displayNames;
+  let rowsCreated = false;
+
+  function languageName(code) {
+    const special = {
+      "zh-Hans": ["Simplified Chinese","简体中文","簡體中文"],
+      "zh-Hant": ["Traditional Chinese","繁体中文","繁體中文"],
+      hbs: ["Serbo-Croatian","塞尔维亚-克罗地亚语","塞爾維亞-克羅埃西亞語"],
+      no: ["Norwegian","挪威语","挪威語"],
+    };
+    const index = locale === "zh-Hans" ? 1 : locale === "zh-Hant" ? 2 : 0;
+    if (special[code]) return special[code][index];
+    try { return displayNames?.of(code) || code; } catch { return code; }
+  }
+
+  function languageOptions(codes) {
+    return codes.map(code => [languageName(code), code])
+      .sort(([left],[right]) => left.localeCompare(right, locale))
+      .map(([name, code]) => new Option(name, code));
+  }
+
+  function updateTargets(preferred) {
+    const allowed = targetCodes.filter(code => globalThis.LocalTranslator.route(fromSelect.value + ":" + code).length);
+    toSelect.replaceChildren(...languageOptions(allowed));
+    if (allowed.includes(preferred)) toSelect.value = preferred;
+    else if (allowed.includes("en")) toSelect.value = "en";
+  }
+
+  function buildModelRows() {
+    if (rowsCreated) return;
+    rowsCreated = true;
+    const rowTemplate = '<th scope="row"><span class="model-language"></span><span class="model-spec"></span></th>'
+      + ["disk", "ram"].map(key => '<td><span class="mobile-label" data-text="' + key + '"></span><div class="model-state"><span data-' + key + '></span><div class="progress-detail" hidden><progress></progress><span class="progress-value"></span></div></div></td>').join("");
+    byId("model-rows").replaceChildren(...directions.map(direction => {
+      const row = document.createElement("tr");
+      row.dataset.direction = direction;
+      row.innerHTML = rowTemplate;
+      return row;
+    }));
   }
   const translateButton = byId("translate");
   const copyButton = byId("copy");
   const localeSelect = byId("interface-language");
   const status = byId("match-status");
   const errorBox = byId("error");
+  const modelStatus = byId("model-status");
   const supportedErrorCodes = [
     "engine-missing", "model-missing", "model-corrupt", "unsupported", "translation-failed", "model-load-failed"
   ];
@@ -129,11 +164,11 @@
 
   const t = (key) => messages[locale][key] || "";
   function renderEditor() {
-    const [from, to] = direction.value.split("-");
-    const shownTarget = last ? last.direction.split("-")[1] : to;
-    const localeIndex = locale === "zh-Hans" ? 1 : locale === "zh-Hant" ? 2 : 0;
-    byId("source-language").textContent = directionLabel(from)[localeIndex];
-    byId("target-language").textContent = directionLabel(shownTarget)[localeIndex];
+    const [from, to] = selectedDirection().split(":");
+    const shownTarget = last ? last.direction.split(":")[1] : to;
+    byId("source-language").textContent = languageName(from);
+    byId("target-language").textContent = languageName(shownTarget);
+    byId("route-note").textContent = globalThis.LocalTranslator.route(selectedDirection()).length > 1 ? t("viaEnglish") : "";
     source.lang = from === "zh" ? "zh-Hans" : from;
     source.dir = "auto";
     result.lang = shownTarget === "zh" ? "zh-Hans" : shownTarget;
@@ -145,7 +180,7 @@
     translateButton.querySelector("span").textContent = t(action);
     translateButton.setAttribute("aria-busy", pending ? "true" : "false");
     const sourceEdited = last && last.text !== source.value;
-    const directionChanged = last && last.direction !== direction.value;
+    const directionChanged = last && last.direction !== selectedDirection();
     let reason = "";
     if (sourceEdited && directionChanged) reason = "staleBoth";
     else if (sourceEdited) reason = "staleSource";
@@ -156,6 +191,14 @@
     errorBox.hidden = !errorCode;
     if (errorBox.textContent !== t(errorCode)) errorBox.textContent = t(errorCode);
     copyButton.querySelector("span").textContent = t(copyMessage || "copy");
+    if (modelStatus) {
+      const job = pending && globalThis.LocalTranslator.route(pending.direction)
+        .map(step => models[step]).find(state => state?.transferProgress || state?.memoryProgress);
+      const progress = job?.transferProgress || job?.memoryProgress;
+      modelStatus.textContent = progress?.total > 0
+        ? t(progress.phase) + " " + Math.floor(progress.loaded * 100 / progress.total) + "%"
+        : pending ? t(action) : "";
+    }
   }
 
   function formatMB(bytes) {
@@ -196,17 +239,28 @@
   }
 
   function renderModels() {
-    document.querySelectorAll("#model-rows tr").forEach((row) => {
-      const state = models[row.dataset.direction] || {};
-      const language = row.querySelector(".model-language"); const localeIndex = locale === "zh-Hans" ? 1 : locale === "zh-Hant" ? 2 : 0;
-      language.textContent = [directionLabel(language.dataset.from)[localeIndex], directionLabel(language.dataset.to)[localeIndex]].join(" → ");
-      row.querySelector(".model-spec").textContent = Number.isFinite(state.bytes) ? formatMB(state.bytes) + " MB" : "";
+    if (!modelDetails.open) return;
+    buildModelRows();
+    document.querySelectorAll("#model-rows tr").forEach(row => {
+      const key = row.dataset.direction;
+      const state = models[key] || {};
+      const [from, to] = key.split(":");
+      row.querySelector(".model-language").textContent = languageName(from) + " → " + languageName(to);
+      const compressed = catalog[key].assets.reduce((sum, asset) => sum + asset.compressedBytes, 0);
+      const kind = catalog[key].architecture === "base" ? "BASE" : catalog[key].architecture;
+      row.querySelector(".model-spec").textContent = kind + " · " + formatMB(compressed) + " MB";
+      for (const label of row.querySelectorAll(".mobile-label")) label.textContent = t(label.dataset.text);
       renderModelState(row, "disk", state.disk, state.transferProgress);
       renderModelState(row, "ram", state.ram, state.memoryProgress);
     });
   }
 
-  buildDirectionControls();
+  const modelDetails = byId("models");
+  modelDetails?.addEventListener("toggle", () => {
+    if (!modelDetails.open) return;
+    refreshModels();
+    globalThis.LocalTranslator.inspectCache().then(refreshModels);
+  });
 
   async function refreshModels() {
     const version = ++refreshId;
@@ -222,13 +276,12 @@
     document.documentElement.lang = locale;
     document.title = t("title") + " · FionViber";
     localeSelect.value = locale;
-    const languageIndex = locale === "zh-Hans" ? 1 : locale === "zh-Hant" ? 2 : 0;
-    const viaEnglish = ["via English", "经英语中转", "經英語轉譯"][languageIndex];
-    for (const option of direction.options) {
-      const [from, to] = option.value.split("-");
-      option.textContent = directionLabel(from)[languageIndex] + " → " + directionLabel(to)[languageIndex]
-        + (globalThis.LocalTranslator.route(option.value).length > 1 ? " (" + viaEnglish + ")" : "");
-    }
+    const from = fromSelect.value || (sourceCodes.includes("zh-Hans") ? "zh-Hans" : sourceCodes[0]);
+    const to = toSelect.value || "en";
+    displayNames = new Intl.DisplayNames([locale], {type:"language"});
+    fromSelect.replaceChildren(...languageOptions(sourceCodes));
+    fromSelect.value = from;
+    updateTargets(to);
     document.querySelectorAll("[data-text]").forEach((element) => {
       element.textContent = t(element.dataset.text);
     });
@@ -243,7 +296,7 @@
 
   translateButton.addEventListener("click", async () => {
     if (pending || !source.value.trim()) return;
-    const submission = { direction: direction.value, text: source.value };
+    const submission = { direction: selectedDirection(), text: source.value };
     pending = submission;
     errorCode = "";
     clearTimeout(copyTimer);
@@ -269,7 +322,9 @@
     renderEditor();
   }
   source.addEventListener("input", onEdit);
-  direction.addEventListener("change", onEdit);
+  fromSelect.addEventListener("change", () => { updateTargets(toSelect.value); onEdit(); });
+  toSelect.addEventListener("change", onEdit);
+  document.querySelector('.nav a[href="#models"]')?.addEventListener("click", () => { modelDetails.open = true; });
   window.addEventListener("translatorstatechange", refreshModels);
 
   copyButton.addEventListener("click", async () => {

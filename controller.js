@@ -7,7 +7,7 @@
   const directions = Object.keys(catalog);
   const idleMillis = 60_000;
   const sessions = new Map();
-  const disk = Object.fromEntries(directions.map(direction => [direction, "checking"]));
+  const disk = Object.fromEntries(directions.map(direction => [direction, "available"]));
   const fail = code => Object.assign(new Error(code), {code});
   const notify = () => window.dispatchEvent(new Event("translatorstatechange"));
   let loadEnginePromise;
@@ -27,7 +27,7 @@
   function ensureEngine() {
     if (!globalThis.WebAssembly || !globalThis.Worker) return Promise.reject(fail("unsupported"));
     if (!loadEnginePromise) {
-      loadEnginePromise = loadScript("engine/bergamot.js").then(() => {
+      loadEnginePromise = loadScript("engine/bergamot.js?v=20261119-language-routing").then(() => {
         if (typeof globalThis.createBergamotWorker !== "function") throw fail("engine-missing");
       }).catch(error => {
         loadEnginePromise = undefined;
@@ -53,7 +53,8 @@
   }
 
   function cacheKey(direction) {
-    return [direction, ...catalog[direction].assets.map(asset => asset.sha256)].join(":");
+    const cacheId = direction.replace("zh-Hans", "zh").replace(":", "-");
+    return [cacheId, ...catalog[direction].assets.map(asset => asset.sha256)].join(":");
   }
 
   async function cacheOperation(direction, method, files) {
@@ -79,12 +80,14 @@
     notify();
   }
 
-  const diskReady = Promise.all(directions.map(inspectDisk));
+  let cacheInspection;
+  function inspectCache() {
+    return cacheInspection ??= Promise.all(directions.map(inspectDisk));
+  }
 
   async function getFiles(session) {
     const {direction} = session;
     const {signal} = session.abort;
-    await diskReady;
     if (signal.aborted) throw fail("model-load-failed");
     if (!catalog[direction]) throw fail("model-missing");
     const existing = await cacheOperation(direction, "get");
@@ -203,7 +206,8 @@
       };
       worker.postMessage({
         type: "init", direction: session.direction, files: payload.files,
-        assets: catalog[session.direction].assets, compressed: payload.format === "gzip-v1",
+        assets: catalog[session.direction].assets, precision: catalog[session.direction].precision,
+        compressed: payload.format === "gzip-v1",
       }, Object.values(payload.files));
     });
   }
@@ -236,9 +240,9 @@
 
   function route(direction) {
     if (Object.hasOwn(catalog, direction)) return [direction];
-    const [from, to, extra] = direction.split("-");
+    const [from, to, extra] = direction.split(":");
     if (!from || !to || extra || from === to || from === "en" || to === "en") return [];
-    const viaEnglish = [from + "-en", "en-" + to];
+    const viaEnglish = [from + ":en", "en:" + to];
     return viaEnglish.every(pair => Object.hasOwn(catalog, pair)) ? viaEnglish : [];
   }
 
@@ -249,7 +253,7 @@
     return text;
   }
 
-  globalThis.LocalTranslator = Object.freeze({ getState, translate, route });
+  globalThis.LocalTranslator = Object.freeze({ getState, translate, route, inspectCache });
   window.addEventListener("pagehide", () => {
     for (const session of sessions.values()) close(session);
   });

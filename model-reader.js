@@ -1,17 +1,17 @@
 "use strict";
 
 (() => {
-  const base = location.hostname === "fionviber.github.io"
-    ? new URL("https://raw.githubusercontent.com/FionViber/OfflineTranslator/main/")
-    : new URL("./", document.baseURI);
+  const base = new URL("./", document.baseURI);
+  const onGitHubPages = location.hostname === "fionviber.github.io";
   const fail = code => Object.assign(new Error(code), { code });
 
   async function appendPart(part, output, offset, signal, report) {
-    const url = new URL(part.path, base);
-    if (url.origin !== base.origin || !url.pathname.startsWith(base.pathname + "v2/")) {
-      throw fail("model-corrupt");
-    }
-    const response = await fetch(url, { mode: "cors", credentials: "omit", redirect: "error", signal })
+    if (!/^v[23]\/[a-z0-9-]+\/[a-zA-Z-]+\/[0-9]+\.bin$/.test(part.path)) throw fail("model-corrupt");
+    const repo = part.repo || "OfflineTranslator";
+    if (!/^(OfflineTranslator|FirefoxTranslationModels-[0-9]{2})$/.test(repo)) throw fail("model-corrupt");
+    const source = onGitHubPages ? new URL("https://raw.githubusercontent.com/FionViber/" + repo + "/main/") : base;
+    const url = new URL(part.path, source);
+    const response = await fetch(url, { mode: "cors", credentials: "omit", redirect: "error", signal: AbortSignal.any([signal, AbortSignal.timeout(90000)]) })
       .catch(() => { throw fail("model-load-failed"); });
     if (!response.ok || !response.body) {
       throw fail(response.status === 404 ? "model-missing" : "model-load-failed");
