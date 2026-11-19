@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' blob: 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com/FionViber/OfflineTranslator/main/v2/; worker-src blob:; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e6f0f8">
+  <title>Translator · FionViber</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/tokens.css">
+  <link rel="stylesheet" href="assets/translator.css">
+  <script defer src="bundle-catalog.js"></script>
+  <script defer src="model-reader.js"></script>
+  <script defer src="controller.js"></script>
+  <script defer src="ui.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace" data-text="skip">Skip to the translator</a>
+  <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="13"/><path d="M6 16H3V3h12v3"/></symbol>
+    <symbol id="i-disk" viewBox="0 0 24 24"><path d="m4 5-2 9v5h20v-5l-2-9zM2 14h20M16 17h3"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24"><path d="M6 6h12v12H6zM9 3v3m6-3v3M9 18v3m6-3v3M3 9h3m-3 6h3m12-6h3m-3 6h3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-language" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18m0-18c-5 5-5 13 0 18"/></symbol>
+    <symbol id="i-translate" viewBox="0 0 24 24"><path d="M2 5h12M8 2v3m-5 3c1.7 3.1 4.9 5.8 8.1 7M12 5c-.6 5.2-3.9 8.9-8.8 11.4M13 21l4.2-11L22 21m-7-3.4h5.5"/></symbol>
+  </svg>
+
+  <header class="masthead">
+    <div class="container mast-inner">
+      <a class="brand" href="#workspace">
+        <svg class="brand-mark" viewBox="0 0 53 60" aria-hidden="true"><path d="M2 56V4h18M33 4h18v52H33M12 16h9v28h-9M32 16h9v28h-9M21 16h11M21 44h11"/></svg>
+        <span>FionViber</span>
+      </a>
+      <label for="interface-language" class="locale-control locale-top"><span data-text="interface">Interface language</span>
+        <select id="interface-language"><option value="en-US" lang="en">English</option><option value="zh-Hans" lang="zh-Hans">简体中文</option><option value="zh-Hant" lang="zh-Hant">繁體中文</option></select>
+      </label>
+    </div>
+    <nav class="nav" aria-label="Page navigation" data-label="nav"><div class="container nav-inner">
+      <a href="#workspace" data-text="workspace" aria-current="location">Translator</a>
+      <a href="#models" data-text="models">Model library</a>
+    </div></nav>
+  </header>
+
+  <main class="container" id="workspace" tabindex="-1">
+    <div class="intro">
+      <h1 data-text="title">Translator</h1>
+      <p data-text="intro">Translate using Firefox BASE models in your browser.</p>
+    </div>
+
+    <section class="editor section" aria-label="Translator" data-label="workspace">
+      <div class="direction-bar">
+        <label for="direction" data-text="direction">Translation direction</label>
+        <select id="direction">
+          <option value="zh-en" data-text="zhen">Simplified Chinese → English</option>
+          <option value="en-zh" data-text="enzh">English → Simplified Chinese</option>
+        </select>
+      </div>
+      <div class="panes">
+        <div class="pane">
+          <div class="pane-heading"><label for="source" data-text="source">Source text</label><span id="source-language" class="language-tag">Simplified Chinese</span></div>
+          <textarea id="source" lang="zh-Hans" placeholder="Type or paste your text here." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+        </div>
+        <div class="pane output-pane">
+          <div class="pane-heading"><label for="result" data-text="result">Translation</label><span id="target-language" class="language-tag">English</span></div>
+          <textarea id="result" lang="en" readonly placeholder="Your translation will appear here." aria-describedby="match-status" spellcheck="false"></textarea>
+          <p id="match-status" class="match-status" role="status" aria-atomic="true"></p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-primary" id="translate" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-translate"/></svg><span>Translate</span></button>
+        <button id="copy" class="copy" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span data-text="copy">Copy translation</span></button>
+      </div>
+      <p id="error" role="alert" hidden></p>
+    </section>
+
+    <section class="model-section section" id="models" aria-labelledby="models-title" tabindex="-1">
+      <div class="model-heading">
+        <h2 id="models-title" data-text="models">Model library</h2>
+        <p><svg class="icon small" aria-hidden="true"><use href="#i-clock"/></svg><span data-text="retention">Models unload after 1 minute of inactivity</span></p>
+      </div>
+      <table class="model-table">
+        <thead><tr>
+          <th scope="col" data-text="model">Translation model</th>
+          <th scope="col"><svg class="icon small" aria-hidden="true"><use href="#i-disk"/></svg><span data-text="disk">From server</span></th>
+          <th scope="col"><svg class="icon small" aria-hidden="true"><use href="#i-chip"/></svg><span data-text="ram">In memory (RAM)</span></th>
+        </tr></thead>
+        <tbody id="model-rows"></tbody>
+      </table>
+    </section>
+    <noscript><p>Enable JavaScript to use the translator. 请启用 JavaScript 以使用翻译功能。</p></noscript>
+  </main>
+  <footer><div class="container foot-inner"><span class="footer-brand">FionViber</span></div></footer>
+</body>
+</html>

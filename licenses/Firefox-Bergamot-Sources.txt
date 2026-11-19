@@ -1,0 +1,20 @@
+Firefox Bergamot translator
+Mozilla Public License 2.0
+
+The JavaScript glue and the locally bundled WebAssembly engine in engine/bergamot.js
+are Mozilla's Bergamot v0.6.0. The local adapter in the same file is provided in
+readable JavaScript source form. The MPL 2.0 license is included in this directory.
+
+Engine source and build scripts
+https://github.com/mozilla/translations/tree/eea6e5a80aa4ddd86d9cc35ce9a65b79aa3ab96d/inference
+
+JavaScript glue
+https://github.com/mozilla-firefox/firefox/blob/48d55cf7ec80093903e2ef7f58b61a84a22ef716/toolkit/components/translations/bergamot-translator/bergamot-translator.js
+SHA-256: faff1ef6285b0d26f01787776fd49299dfb756ecb9688aa990c250e66797b47d
+
+Firefox translation worker reference
+https://github.com/mozilla-firefox/firefox/blob/48d55cf7ec80093903e2ef7f58b61a84a22ef716/toolkit/components/translations/content/translations-engine.worker.js
+
+Mozilla Remote Settings engine binary, version 4.0
+https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-wasm-v2/a76f9efe-b185-4a7f-9c3b-5f5d216d12e6.zst
+SHA-256 (WebAssembly module): f38ef807636a7c994afedaab7ff8ffe0d590d21897f05139f747b80fd7bbe926

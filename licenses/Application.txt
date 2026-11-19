@@ -1,0 +1,7 @@
+The new offline translator application code in this package is licensed under the
+Mozilla Public License 2.0. A copy of the license is included in
+Firefox-Bergamot-MPL-2.0.txt.
+
+The model and runtime source records in this directory identify the upstream
+projects, releases, licenses, and checksums. The website template and FionViber
+branding were supplied by the site owner.
