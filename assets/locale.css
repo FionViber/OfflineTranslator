@@ -25,3 +25,6 @@ select[data-asq-native][hidden] {display:none!important}
 
 .asq-locale-field { display:inline-flex;align-items:center;max-width:100%;min-width:0 }
 .asq-icon {vertical-align:-.16em;flex:none;margin-inline-end:.35em}
+
+.language-choice .asq-picker,.language-choice .asq-picker-trigger {width:100%}
+.language-choice .asq-picker-menu {inset-inline:0;min-width:100%}

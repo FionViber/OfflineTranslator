@@ -60,8 +60,8 @@
 
     <section class="editor section" aria-label="Translator" data-label="workspace">
       <div class="direction-bar">
-        <label class="language-choice"><span data-text="fromLanguage">From</span><select id="from-language"></select></label>
-        <label class="language-choice"><span data-text="toLanguage">To</span><select id="to-language"></select></label>
+        <div class="language-choice"><label id="from-language-name" for="from-language" data-text="fromLanguage">From</label><select id="from-language" aria-labelledby="from-language-name"></select></div>
+        <div class="language-choice"><label id="to-language-name" for="to-language" data-text="toLanguage">To</label><select id="to-language" aria-labelledby="to-language-name"></select></div>
         <span id="route-note" class="route-note"></span>
       </div>
       <div class="panes">
