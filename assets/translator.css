@@ -94,6 +94,10 @@ footer { background: #f7f9fb; border-top: 1px solid var(--line); }
 .footer-brand { color: var(--heading); font-size: 16px; font-weight: 650; letter-spacing: -.025em; }
 .locale-control { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
 .locale-control select { border-color: #b5c8d7; margin-inline-start: 2px; }
+.locale-control { border: 1px solid transparent; }
+.locale-control:focus-within { outline: 2px solid var(--link); outline-offset: 0; }
+.locale-control select:focus-visible { outline: none; }
+.locale-icon { width: 18px; height: 18px; flex: none; }
 @media (max-width: 719px) {
   .panes { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px 16px 0; }
   textarea { height: 145px; min-height: 110px; }
