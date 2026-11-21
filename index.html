@@ -35,7 +35,6 @@
         <span>FionViber</span>
       </a>
       <div class="mast-actions">
-        <a class="directory-link" href="https://fionviber.github.io/" data-text="directory">Project directory</a>
         <div class="asq-locale-field"><span class="sr-only" id="asq-lang-name" data-text="interface">Interface language</span><select aria-labelledby="asq-lang-name" id="interface-language"><option value="en-US" lang="en">English</option><option value="zh-Hans" lang="zh-Hans">简体中文</option><option value="zh-Hant" lang="zh-Hant">繁體中文</option></select></div>
       </div>
     </div>
@@ -68,17 +67,17 @@
         <div class="pane">
           <div class="pane-heading"><label for="source" data-text="source">Source text</label><span id="source-language" class="language-tag">Simplified Chinese</span></div>
           <textarea id="source" lang="zh-Hans" placeholder="Type or paste your text here." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+          <div class="actions">
+            <button class="btn-primary" id="translate" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-translate"/></svg><span>Translate</span></button>
+            <span id="model-status" class="model-status" role="status" aria-live="polite"></span>
+          </div>
         </div>
         <div class="pane output-pane">
           <div class="pane-heading"><label for="result" data-text="result">Translation</label><span id="target-language" class="language-tag">English</span></div>
           <textarea id="result" lang="en" readonly placeholder="Your translation will appear here." aria-describedby="match-status" spellcheck="false"></textarea>
+          <div class="actions"><button id="copy" class="copy" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span data-text="copy">Copy translation</span></button></div>
           <p id="match-status" class="match-status" role="status" aria-atomic="true"></p>
         </div>
-      </div>
-      <div class="actions">
-        <button class="btn-primary" id="translate" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-translate"/></svg><span>Translate</span></button>
-        <button id="copy" class="copy" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span data-text="copy">Copy translation</span></button>
-        <span id="model-status" class="model-status" role="status" aria-live="polite"></span>
       </div>
       <p id="error" role="alert" hidden></p>
     </section>
@@ -99,6 +98,7 @@
     </details>
     <noscript><p>Enable JavaScript to use the translator. 请启用 JavaScript 以使用翻译功能。</p></noscript>
   </main>
-  <footer><div class="container foot-inner"><span class="footer-brand">FionViber</span></div></footer>
+  <footer><div class="container foot-inner"><span class="footer-brand">FionViber</span>
+    <a class="directory-link" href="https://fionviber.github.io/" data-text="directory">Project directory</a></div></footer>
 </body>
 </html>
