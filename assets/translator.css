@@ -126,3 +126,16 @@ footer { background: #f7f9fb; border-top: 1px solid var(--line); }
 .language-choice select { width: 100%; }
 .route-note { flex: 0 1 auto; color: var(--muted); font-size: .875rem; }
 .route-note:empty { display: none; }
+.masthead { border-bottom: 1px solid var(--line); }
+.panel, .model-section { border-color: var(--line); }
+.panel:focus-within { border-color: var(--blue); }
+button:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+.model-section summary:hover { background: var(--pale); color: var(--blue); }
+@media (max-width: 620px) {
+  .mast-inner { flex-wrap: wrap; }
+  .mast-actions { width: 100%; justify-content: space-between; }
+  .language-choice { flex-basis: 100%; }
+}
