@@ -45,10 +45,10 @@ button:active:not(:disabled) {
   transform: translate(0, 0);
   box-shadow: none;
 }
-.model-library {
+.model-section {
   border-inline-start: 4px solid var(--accent);
 }
-.model-library summary:hover {
+.model-section summary:hover {
   color: var(--blue);
   background: var(--pale);
 }
