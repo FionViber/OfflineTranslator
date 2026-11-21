@@ -97,12 +97,6 @@ footer { background: #f7f9fb; border-top: 1px solid var(--line); }
 .locale-control { border: 1px solid transparent; }
 .locale-control:focus-within { outline: 2px solid var(--link); outline-offset: 0; }
 .locale-control select:focus-visible { outline: none; }
-.locale-icon { width: 18px; height: 18px; flex: none; }
-.locale-button { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 0; background: var(--surface); color: var(--ink); font: inherit; }
-.locale-button img { width: 18px; height: 18px; }
-.locale-menu { position: absolute; z-index: 5; margin-top: 2px; border: 1px solid var(--line); background: var(--surface); }
-.locale-option { display: block; width: 100%; min-height: 44px; padding: 8px 12px; border: 0; background: var(--surface); color: var(--ink); text-align: start; }
-.locale-option:hover, .locale-option[aria-selected="true"] { background: var(--pale); }
 @media (max-width: 719px) {
   .panes { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px 16px 0; }
   textarea { height: 145px; min-height: 110px; }
@@ -141,7 +135,7 @@ footer { background: #f7f9fb; border-top: 1px solid var(--line); }
 .panel:focus-within { border-color: var(--blue); }
 button:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid var(--blue);
-  outline-offset: 3px;
+  outline-offset:0;
 }
 .model-section summary:hover { background: var(--pale); color: var(--blue); }
 @media (max-width: 620px) {
