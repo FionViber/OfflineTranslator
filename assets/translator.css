@@ -127,6 +127,7 @@ footer { background: #f7f9fb; border-top: 1px solid var(--line); }
 .route-note { flex: 0 1 auto; color: var(--muted); font-size: .875rem; }
 .route-note:empty { display: none; }
 .masthead { border-bottom: 1px solid var(--line); }
+.mast-actions { display: flex; align-items: center; gap: 16px; }
 .panel, .model-section { border-color: var(--line); }
 .panel:focus-within { border-color: var(--blue); }
 button:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible {
